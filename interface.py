@@ -25,22 +25,35 @@ class BotInterface():
         self.offset = 0
         self.waiting_for_user_info = False
 
+    def request_info(self):
+        for event in self.longpoll.listen():
+            if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+                return event.text
+
     def save_user_info(self, user_id):
         user = User()
         user_info = self.vk_tools.get_profile_info()
+        sexes = ('мужской', 'женский')
         if not user_info.get('sex'):
             self.send_message(user_id, 'Введите ваш пол (мужской/женский):')
             self.waiting_for_user_info = True
+            user_sex = self.request_info()
+            if user_sex in sexes:
+                user_info['sex'] = user_sex
+            else:
+                self.send_message(user_id, 'Неверное значение для пола')
 
         if not user_info.get('city'):
             self.send_message(user_id, 'Введите ваш город:')
             self.waiting_for_user_info = True
+            user_info['city'] = self.request_info()
 
         if not user_info.get('age'):
             self.send_message(
                 user_id, 'Введите ваш возраст:'
             )
             self.waiting_for_user_info = True
+            user_info['age'] = self.request_info()
 
         user.save_user_info_to_database(
             user_info['city'], user_info['sex'], user_info['age']
@@ -109,7 +122,8 @@ class BotInterface():
 
 if __name__ == '__main__':
     bot_interface = BotInterface(community_token, access_token)
-    if bot_interface.waiting_for_user_info:
-        user_id = bot_interface.vk_tools.get_profile_info()['user_id']
-        bot_interface.save_user_info(user_id)
+    params = bot_interface.vk_tools.get_profile_info()
+    if (params['age'] is None or params['city'] is None or
+       params['sex'] is None):
+        bot_interface.waiting_for_user_info = True
     bot_interface.event_hanlder()

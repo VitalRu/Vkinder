@@ -22,7 +22,7 @@ class User(Base):
     profile_id = Column(Integer, primary_key=True)
     profile_city = Column(String)
     profile_sex = Column(Integer)
-    profile_age = Column(String)
+    profile_age = Column(Integer)
 
     @staticmethod
     def save_user_info_to_database(user_city, user_sex, user_age):

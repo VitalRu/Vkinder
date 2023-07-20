@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-from pprint import pprint
 
 import vk_api
 from dotenv import load_dotenv
@@ -115,9 +114,3 @@ if __name__ == '__main__':
     worksheets = tools.search_worksheet(params, 10)
     worksheet = worksheets.pop()
     photos = tools.get_photos(worksheet['id'])
-
-    pprint(params)
-
-    pprint(worksheets)
-    pprint(worksheet)
-    pprint(photos)
