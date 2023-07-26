@@ -35,8 +35,8 @@ class BotInterface():
         self.params = self.vk_tools.get_profile_info(user_id)
         if not self.params.get('sex'):
             self.send_message(user_id, 'Введите ваш пол (мужской/женский):')
-            # self.waiting_for_user_info = True
             user_sex = self.request_info()
+
         if user_sex.lower() == 'женский':
             self.params['sex'] = 1
         elif user_sex.lower() == 'мужской':
@@ -47,21 +47,19 @@ class BotInterface():
 
         if not self.params.get('city'):
             self.send_message(user_id, 'Введите ваш город:')
-            # self.waiting_for_user_info = True
             self.params['city'] = self.request_info()
 
         if not self.params.get('age'):
             self.send_message(
                 user_id, 'Введите ваш возраст:'
             )
-            # self.waiting_for_user_info = True
             self.params['age'] = int(self.request_info())
 
         user = User(
             self.params['sex'], self.params['city'], self.params['age']
         )
         self.send_message(user_id, 'Спасибо! Ваши данные сохранены.')
-        # self.waiting_for_user_info = False
+
         user_fields = {
             'sex': user.profile_sex,
             'city': user.profile_city,
@@ -138,5 +136,4 @@ class BotInterface():
 
 if __name__ == '__main__':
     bot_interface = BotInterface(community_token, access_token)
-    # params = bot_interface.vk_tools.get_profile_info(my_id)
     bot_interface.event_hanlder()

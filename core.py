@@ -34,23 +34,6 @@ class VkTools():
             info = {}
             print(f'error = {e}')
 
-        # result = {
-
-        #     'user_id': info.get('id'),
-
-        #     'name': (info['first_name'] + ' ' + info['last_name']) if
-        #     'first_name' in info and 'last_name' in info else None,
-
-        #     'sex': info.get('sex') if 'sex' in info else None,
-
-        #     'city': (info.get('city')['title'] if
-        #              info.get('city') is not None else None),
-
-        #     'age': (self._bdate_to_age(info.get('bdate')) if
-        #             'bdate' in info else None),
-
-        # }
-
         result = {
 
             'user_id': info.get('id'),
@@ -58,13 +41,30 @@ class VkTools():
             'name': (info['first_name'] + ' ' + info['last_name']) if
             'first_name' in info and 'last_name' in info else None,
 
-            'sex': None,
+            'sex': info.get('sex') if 'sex' in info else None,
 
-            'city': None,
+            'city': (info.get('city')['title'] if
+                     info.get('city') is not None else None),
 
-            'age': None,
+            'age': (self._bdate_to_age(info.get('bdate')) if
+                    'bdate' in info else None),
 
         }
+
+        # result = {
+
+        #     'user_id': info.get('id'),
+
+        #     'name': (info['first_name'] + ' ' + info['last_name']) if
+        #     'first_name' in info and 'last_name' in info else None,
+
+        #     'sex': None,
+
+        #     'city': None,
+
+        #     'age': None,
+
+        # }
 
         return result
 
