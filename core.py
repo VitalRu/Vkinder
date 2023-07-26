@@ -20,19 +20,20 @@ class VkTools():
         now = datetime.now().year
         return (now - int(user_birth_year))
 
-    def get_profile_info(self):
+    def get_profile_info(self, user_id):
 
         try:
             info, = self.vkapi.method(
                 'users.get',
                 {
-                    'id': 'id',
+                    'user_id': user_id,
                     'fields': 'city, sex, bdate',
                 }
             )
         except ApiError as e:
             info = {}
             print(f'error = {e}')
+
         # result = {
 
         #     'user_id': info.get('id'),
@@ -79,7 +80,7 @@ class VkTools():
                     'has_photo': True,
                     'age_from': params['age'] - 3,
                     'age_to': params['age'] + 3,
-                    'relation': 1 or 6,
+                    'status': 1 or 6,
                 }
             )
         except ApiError as e:
@@ -125,8 +126,3 @@ class VkTools():
 
 if __name__ == '__main__':
     tools = VkTools(access_token)
-    params = tools.get_profile_info()
-    print(params)
-    worksheets = tools.search_worksheet(params, 10)
-    worksheet = worksheets.pop()
-    photos = tools.get_photos(worksheet['id'])
