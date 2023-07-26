@@ -33,6 +33,22 @@ class VkTools():
         except ApiError as e:
             info = {}
             print(f'error = {e}')
+        # result = {
+
+        #     'user_id': info.get('id'),
+
+        #     'name': (info['first_name'] + ' ' + info['last_name']) if
+        #     'first_name' in info and 'last_name' in info else None,
+
+        #     'sex': info.get('sex') if 'sex' in info else None,
+
+        #     'city': (info.get('city')['title'] if
+        #              info.get('city') is not None else None),
+
+        #     'age': (self._bdate_to_age(info.get('bdate')) if
+        #             'bdate' in info else None),
+
+        # }
 
         result = {
 
@@ -41,15 +57,14 @@ class VkTools():
             'name': (info['first_name'] + ' ' + info['last_name']) if
             'first_name' in info and 'last_name' in info else None,
 
-            'sex': info.get('sex') if 'sex' in info else None,
+            'sex': None,
 
-            'city': (info.get('city')['title'] if
-                     info.get('city') is not None else None),
+            'city': None,
 
-            'age': (self._bdate_to_age(info.get('bdate')) if
-                    'bdate' in info else None),
+            'age': None,
 
         }
+
         return result
 
     def search_worksheet(self, params, offset):
@@ -111,6 +126,7 @@ class VkTools():
 if __name__ == '__main__':
     tools = VkTools(access_token)
     params = tools.get_profile_info()
+    print(params)
     worksheets = tools.search_worksheet(params, 10)
     worksheet = worksheets.pop()
     photos = tools.get_photos(worksheet['id'])

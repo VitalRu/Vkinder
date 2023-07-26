@@ -31,17 +31,18 @@ class BotInterface():
                 return event.text
 
     def save_user_info(self, user_id):
-        user = User()
         user_info = self.vk_tools.get_profile_info()
-        sexes = ('мужской', 'женский')
         if not user_info.get('sex'):
             self.send_message(user_id, 'Введите ваш пол (мужской/женский):')
             self.waiting_for_user_info = True
             user_sex = self.request_info()
-            if user_sex in sexes:
-                user_info['sex'] = user_sex
-            else:
-                self.send_message(user_id, 'Неверное значение для пола')
+        if user_sex.lower() == 'женский':
+            user_info['sex'] = 1
+        elif user_sex.lower() == 'мужской':
+            user_info['sex'] = 2
+        else:
+            user_sex = None
+            self.send_message(user_id, 'Неверное значение для пола')
 
         if not user_info.get('city'):
             self.send_message(user_id, 'Введите ваш город:')
@@ -55,12 +56,19 @@ class BotInterface():
             self.waiting_for_user_info = True
             user_info['age'] = self.request_info()
 
-        user.save_user_info_to_database(
-            user_info['city'], user_info['sex'], user_info['age']
-        )
-
+        user = User(user_info['sex'], user_info['city'], user_info['age'])
         self.send_message(user_id, 'Спасибо! Ваши данные сохранены.')
         self.waiting_for_user_info = False
+        user_fields = {
+            'sex': user.profile_sex,
+            'city': user.profile_city,
+            'age': user.profile_age,
+        }
+
+        profile_info = user_info.copy()
+        profile_info.update(user_fields)
+
+        return profile_info
 
     def send_message(self, user_id, message, attachment=None):
         self.vk_session.method(
@@ -84,13 +92,14 @@ class BotInterface():
     def event_hanlder(self):
 
         for event in self.longpoll.listen():
-
+            self.params = self.vk_tools.get_profile_info()
             if self.waiting_for_user_info:
                 self.save_user_info(event.user_id)
+                self.params = self.save_user_info(event.user_id)
 
             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
                 if event.text.lower() == 'привет':
-                    self.params = self.vk_tools.get_profile_info()
+                    # self.params = self.vk_tools.get_profile_info()
                     self.send_message(
                         event.user_id, f'Привет, {self.params["name"]}'
                     )
@@ -126,4 +135,7 @@ if __name__ == '__main__':
     if (params['age'] is None or params['city'] is None or
        params['sex'] is None):
         bot_interface.waiting_for_user_info = True
+    user_id = user_id = bot_interface.vk_tools.get_profile_info()['user_id']
+    print('>>>', bot_interface.save_user_info(user_id))
+    print('>>>>>', bot_interface.vk_tools.get_profile_info())
     bot_interface.event_hanlder()

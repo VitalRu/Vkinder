@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
-from sqlalchemy import Column, Integer, String, MetaData, create_engine
+from sqlalchemy import Column, Integer, MetaData, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 
@@ -19,18 +19,22 @@ engine.connect()
 
 class User(Base):
     __tablename__ = 'user'
-    profile_id = Column(Integer, primary_key=True)
-    profile_city = Column(String)
-    profile_sex = Column(Integer)
-    profile_age = Column(Integer)
+    id = Column(Integer, primary_key=True)
 
-    @staticmethod
-    def save_user_info_to_database(user_city, user_sex, user_age):
+    def __init__(
+            self,
+            sex=None,
+            city=None,
+            age=None
+    ):
+        self.profile_sex = sex
+        self.profile_city = city
+        self.profile_age = age
+
+    def save_user_info_to_database(self, city, sex, age):
         with Session(engine) as session:
             to_bd = User(
-                profile_city=user_city,
-                profile_sex=user_sex,
-                profile_age=user_age,
+                sex=sex, city=city, age=age,
             )
             session.add(to_bd)
             session.commit()
