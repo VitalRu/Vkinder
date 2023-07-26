@@ -35,7 +35,7 @@ class BotInterface():
         self.params = self.vk_tools.get_profile_info(user_id)
         if not self.params.get('sex'):
             self.send_message(user_id, 'Введите ваш пол (мужской/женский):')
-            self.waiting_for_user_info = True
+            # self.waiting_for_user_info = True
             user_sex = self.request_info()
         if user_sex.lower() == 'женский':
             self.params['sex'] = 1
@@ -47,31 +47,31 @@ class BotInterface():
 
         if not self.params.get('city'):
             self.send_message(user_id, 'Введите ваш город:')
-            self.waiting_for_user_info = True
+            # self.waiting_for_user_info = True
             self.params['city'] = self.request_info()
 
         if not self.params.get('age'):
             self.send_message(
                 user_id, 'Введите ваш возраст:'
             )
-            self.waiting_for_user_info = True
+            # self.waiting_for_user_info = True
             self.params['age'] = int(self.request_info())
 
         user = User(
             self.params['sex'], self.params['city'], self.params['age']
         )
         self.send_message(user_id, 'Спасибо! Ваши данные сохранены.')
-        self.waiting_for_user_info = False
+        # self.waiting_for_user_info = False
         user_fields = {
             'sex': user.profile_sex,
             'city': user.profile_city,
             'age': user.profile_age,
         }
 
-        # profile_info = self.params.copy()
-        self.params.update(user_fields)
+        updated_params = self.params.copy()
+        updated_params.update(user_fields)
 
-        return self.params
+        return updated_params
 
     def send_message(self, user_id, message, attachment=None):
         self.vk_session.method(
@@ -95,12 +95,18 @@ class BotInterface():
     def event_hanlder(self):
 
         for event in self.longpoll.listen():
-            self.params = self.vk_tools.get_profile_info(event.peer_id)
-            if self.waiting_for_user_info:
-                params = self.save_user_info(event.user_id)
-                self.params = params
+
             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
                 if event.text.lower() == 'привет':
+                    self.params = self.vk_tools.get_profile_info(event.peer_id)
+
+                    if (self.params['age'] is None or self.params['city']
+                       is None or self.params['sex'] is None):
+                        self.waiting_for_user_info = True
+                        updated = self.save_user_info(event.user_id).copy()
+                        self.params = updated
+                        self.waiting_for_user_info = False
+
                     self.send_message(
                         event.user_id, f'Привет, {self.params["name"]}'
                     )
@@ -132,8 +138,5 @@ class BotInterface():
 
 if __name__ == '__main__':
     bot_interface = BotInterface(community_token, access_token)
-    params = bot_interface.vk_tools.get_profile_info(my_id)
-    if (params['age'] is None or params['city'] is None or
-       params['sex'] is None):
-        bot_interface.waiting_for_user_info = True
+    # params = bot_interface.vk_tools.get_profile_info(my_id)
     bot_interface.event_hanlder()
