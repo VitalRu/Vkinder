@@ -15,6 +15,6 @@
 
 1. Для работы бота необходимо получить токен пользователя([access token](https://dev.vk.com/ru/api/access-token/getting-started)) и токен сообщества, где будет размещен бот ([community token](https://dev.vk.com/ru/api/access-token/getting-started))
 2. В корневой директории проекта необходимо создать файл `.env`, и поместить туда значения токенов
-3. Установить виртуальное окружение команда ```python -m venv venv``` \
-4. Установить requirements.txt команда ```pip install -r requirements.txt``` \
+3. Установить виртуальное окружение ```python -m venv venv``` 
+4. Установить requirements.txt ```pip install -r requirements.txt``` 
 5. Запустить программу (файл ```interface.py```) ```python interface.py```<br>
